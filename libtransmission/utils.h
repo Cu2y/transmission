@@ -4,7 +4,95 @@
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
+<<<<<<< HEAD
  */
+=======
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ *****************************************************************************/
+
+#ifndef TR_UTILS_H
+#define TR_UTILS_H 1
+
+void tr_msgInit( void );
+
+#define tr_err( a... ) tr_msg( TR_MSG_ERR, ## a )
+#define tr_inf( a... ) tr_msg( TR_MSG_INF, ## a )
+#define tr_dbg( a... ) tr_msg( TR_MSG_DBG, ## a )
+void tr_msg  ( int level, char * msg, ... ) PRINTF( 2, 3 );
+
+int  tr_rand ( int );
+
+void * tr_memmem( const void *, size_t, const void *, size_t );
+
+/***********************************************************************
+ * tr_mkdir
+ ***********************************************************************
+ * Create a directory and any needed parent directories.
+ * Note that the string passed in must be writable!
+ **********************************************************************/
+int tr_mkdir( char * path );
+
+/***********************************************************************
+ * tr_strcasecmp
+ ***********************************************************************
+ * A case-insensitive strncmp()
+ **********************************************************************/
+#define tr_strcasecmp( ff, ss ) ( tr_strncasecmp( (ff), (ss), -1 ) )
+int tr_strncasecmp( const char * first, const char * second, int len );
+
+/***********************************************************************
+ * tr_sprintf
+ ***********************************************************************
+ * Appends to the end of a buffer using printf formatting,
+ * growing the buffer if needed
+ **********************************************************************/
+int tr_sprintf( char ** buf, int * used, int * max,
+                const char * format, ... ) PRINTF( 4, 5 );
+/* gee, it sure would be nice if BeOS had va_copy() */
+int tr_vsprintf( char **, int *, int *, const char *, va_list, va_list );
+/* this concatenates some binary data onto the end of a buffer */
+int tr_concat( char ** buf, int * used, int * max,
+               const char * data, int len );
+
+/***********************************************************************
+ * tr_dupstr
+ ***********************************************************************
+ * Creates a nul-terminated string 
+ **********************************************************************/
+char * tr_dupstr( const char * base, int len );
+
+int    tr_ioErrorFromErrno( void );
+
+char * tr_errorString( int code );
+
+/***********************************************************************
+ * tr_date
+ ***********************************************************************
+ * Returns the current date in milliseconds
+ **********************************************************************/
+static inline uint64_t tr_date()
+{
+    struct timeval tv;
+    gettimeofday( &tv, NULL );
+    return (uint64_t) tv.tv_sec * 1000 + ( tv.tv_usec / 1000 );
+}
+>>>>>>> origin/0.7x
 
 #pragma once
 

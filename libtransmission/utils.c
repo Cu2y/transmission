@@ -622,7 +622,31 @@ char* tr_strjoin(char const* const* arr, size_t len, char const* delim)
     return ret;
 }
 
+<<<<<<< HEAD
 char* tr_strstrip(char* str)
+=======
+int
+tr_ioErrorFromErrno( void )
+{
+    if( EACCES == errno || EROFS == errno )
+    {
+        return TR_ERROR_IO_PERMISSIONS;
+    }
+    else if( ENOSPC == errno )
+    {
+        return TR_ERROR_IO_SPACE;
+    }
+    else if( EMFILE == errno || EFBIG == errno )
+    {
+        return TR_ERROR_IO_RESOURCES;
+    }
+    tr_dbg( "generic i/o errno from errno: %s", strerror( errno ) );
+    return TR_ERROR_IO_OTHER;
+}
+
+char *
+tr_errorString( int code )
+>>>>>>> origin/0.7x
 {
     if (str != NULL)
     {
@@ -668,7 +692,26 @@ bool tr_str_has_suffix(char const* str, char const* suffix)
 
     if (str_len < suffix_len)
     {
+<<<<<<< HEAD
         return false;
+=======
+        case TR_OK:
+            return "No error";
+        case TR_ERROR:
+            return "Generic error";
+        case TR_ERROR_ASSERT:
+            return "Assert error";
+        case TR_ERROR_IO_PARENT:
+            return "Download folder does not exist";
+        case TR_ERROR_IO_PERMISSIONS:
+            return "Insufficient permissions";
+        case TR_ERROR_IO_SPACE:
+            return "Insufficient free space";
+        case TR_ERROR_IO_RESOURCES:
+            return "Insufficient resources";
+        case TR_ERROR_IO_OTHER:
+            return "Generic I/O error";
+>>>>>>> origin/0.7x
     }
 
     return evutil_ascii_strncasecmp(str + str_len - suffix_len, suffix, suffix_len) == 0;

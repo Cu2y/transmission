@@ -172,7 +172,17 @@ void tr_ioFindFileLocation(tr_torrent const* tor, tr_piece_index_t pieceIndex, u
 
     TR_ASSERT(offset < tor->info.totalSize);
 
+<<<<<<< HEAD
     tr_file const* file = bsearch(&offset, tor->info.files, tor->info.fileCount, sizeof(tr_file), compareOffsetToFile);
+=======
+            /* do what we are here to do... */
+            if( readOrWrite( file, buf, cur ) != cur )
+            {
+                ret = tr_ioErrorFromErrno();
+                tr_fdFileRelease( file );
+                goto cleanup;
+            }
+>>>>>>> origin/0.7x
 
     TR_ASSERT(file != NULL);
 

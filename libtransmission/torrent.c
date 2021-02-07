@@ -518,6 +518,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
     /* if we're seeding and reach our inactiviy limit, stop the torrent */
     else if (tr_torrentIsSeedIdleLimitDone(tor))
     {
+<<<<<<< HEAD
         tr_logAddTorInfo(tor, "%s", "Seeding idle limit reached; pausing torrent");
 
         tor->isStopping = true;
@@ -528,6 +529,17 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
         {
             (*tor->idle_limit_hit_func)(tor, tor->idle_limit_hit_func_user_data);
         }
+=======
+        s->eta = (float) s->left / s->rateDownload / 1024.0;
+    }
+
+    s->downloaded = tor->downloadedCur + tor->downloadedPrev;
+    s->uploaded   = tor->uploadedCur   + tor->uploadedPrev;
+    
+    if( s->downloaded == 0 && s->progress == 0.0 )
+    {
+        s->ratio = TR_RATIO_NA;
+>>>>>>> origin/0.7x
     }
 }
 
@@ -551,7 +563,11 @@ void tr_torrentSetLocalError(tr_torrent* tor, char const* fmt, ...)
 
     if (tor->isRunning)
     {
+<<<<<<< HEAD
         tor->isStopping = true;
+=======
+        s->ratio = (float)s->uploaded / (float)MAX(s->downloaded, inf->totalSize - s->left);
+>>>>>>> origin/0.7x
     }
 }
 

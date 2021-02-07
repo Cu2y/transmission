@@ -1123,7 +1123,28 @@ typedef enum
 }
 tr_ratiolimit;
 
+<<<<<<< HEAD
 void tr_torrentSetRatioMode(tr_torrent* tor, tr_ratiolimit mode);
+=======
+/***********************************************************************
+ * Error codes
+ **********************************************************************/
+/* General errors */
+#define TR_OK                   0x00000000
+#define TR_ERROR                0x81000000
+#define TR_ERROR_ASSERT         0x82000000
+/* I/O errors */
+#define TR_ERROR_IO_MASK        0x000000FF
+#define TR_ERROR_IO_PARENT      0x80000001
+#define TR_ERROR_IO_PERMISSIONS 0x80000002
+#define TR_ERROR_IO_SPACE       0x80000004
+#define TR_ERROR_IO_RESOURCES   0x80000008
+#define TR_ERROR_IO_OTHER       0x80000010
+/* Misc */
+#define TR_ERROR_TC_MASK        0x00000F00
+#define TR_ERROR_TC_ERROR       0x80000100
+#define TR_ERROR_TC_WARNING     0x80000200
+>>>>>>> origin/0.7x
 
 tr_ratiolimit tr_torrentGetRatioMode(tr_torrent const* tor);
 
@@ -1628,6 +1649,7 @@ struct tr_info
     /* Torrent info */
     time_t dateCreated;
 
+<<<<<<< HEAD
     unsigned int trackerCount;
     unsigned int webseedCount;
     tr_file_index_t fileCount;
@@ -1637,6 +1659,51 @@ struct tr_info
     /* General info */
     uint8_t hash[SHA_DIGEST_LENGTH];
     char hashString[2 * SHA_DIGEST_LENGTH + 1];
+=======
+/***********************************************************************
+ * tr_stat_s
+ **********************************************************************/
+struct tr_stat_s
+{
+#define TR_STATUS_CHECK    0x001 /* Checking files */
+#define TR_STATUS_DOWNLOAD 0x002 /* Downloading */
+#define TR_STATUS_SEED     0x004 /* Seeding */
+#define TR_STATUS_STOPPING 0x008 /* Sending 'stopped' to the tracker */
+#define TR_STATUS_STOPPED  0x010 /* Sent 'stopped' but thread still
+                                    running (for internal use only) */
+#define TR_STATUS_PAUSE    0x020 /* Paused */
+
+#define TR_STATUS_ACTIVE   (TR_STATUS_CHECK|TR_STATUS_DOWNLOAD|TR_STATUS_SEED)
+#define TR_STATUS_INACTIVE (TR_STATUS_STOPPING|TR_STATUS_STOPPED|TR_STATUS_PAUSE)
+    int                 status;
+
+    int                 error;
+    char                errorString[128];
+    int                 cannotConnect;
+
+    tr_tracker_info_t * tracker;
+
+    float               progress;
+    float               rateDownload;
+    float               rateUpload;
+    int                 eta;
+    int                 peersTotal;
+    int                 peersFrom[TR_PEER_FROM__MAX];
+    int                 peersUploading;
+    int                 peersDownloading;
+    int                 seeders;
+    int                 leechers;
+    int                 completedFromTracker;
+
+    uint64_t            left;
+    uint64_t            downloaded;
+    uint64_t            uploaded;
+    float               swarmspeed;
+
+#define TR_RATIO_NA  -1
+    float               ratio;
+};
+>>>>>>> origin/0.7x
 
     /* Flags */
     bool isPrivate;

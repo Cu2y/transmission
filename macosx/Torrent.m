@@ -58,7 +58,44 @@
 - (BOOL) shouldShowEta;
 - (NSString *) etaString;
 
+<<<<<<< HEAD
 - (void) setTimeMachineExclude: (BOOL) exclude;
+=======
+// Used to optimize drawing. They contain packed RGBA pixels for every color needed.
+#define BE OSSwapBigToHostConstInt32
+
+static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
+                kBlue = BE(0x50A0FFFF), //80, 160, 255
+                kBlue2 = BE(0x1E46B4FF), //30, 70, 180
+                kGray  = BE(0x969696FF), //150, 150, 150
+                kGreen1 = BE(0x99FFCCFF), //153, 255, 204
+                kGreen2 = BE(0x66FF99FF), //102, 255, 153
+                kGreen3 = BE(0x00FF66FF), //0, 255, 102
+                kWhite = BE(0xFFFFFFFF); //255, 255, 255
+
+- (id) initWithPath: (NSString *) path forceDeleteTorrent: (BOOL) delete lib: (tr_handle_t *) lib
+{
+    self = [self initWithHash: nil path: path lib: lib
+            publicTorrent: delete ? [NSNumber numberWithBool: NO] : nil
+            dateAdded: nil dateCompleted: nil
+            ratioSetting: nil ratioLimit: nil
+            limitSpeedCustom: nil
+            checkUpload: nil uploadLimit: nil
+            checkDownload: nil downloadLimit: nil
+			pex: nil
+            waitToStart: nil orderValue: nil];
+    
+    if (self)
+    {
+        fUseIncompleteFolder = [fDefaults boolForKey: @"UseIncompleteDownloadFolder"];
+        fIncompleteFolder = [[[fDefaults stringForKey: @"IncompleteDownloadFolder"] stringByExpandingTildeInPath] retain];
+        
+        if (!fPublicTorrent)
+            [self trashFile: path];
+    }
+    return self;
+}
+>>>>>>> origin/0.7x
 
 @end
 
@@ -124,6 +161,30 @@ bool trashDataFile(const char * filename, tr_error ** error)
             tr_error_set_literal(error, [localError code], [[localError description] UTF8String]);
             return false;
         }
+<<<<<<< HEAD
+=======
+		
+		if (fDateCompleted)
+			[fDateCompleted release];
+		fDateCompleted = [[NSDate alloc] init];
+        
+        fStat = tr_torrentStat(fHandle);
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
+    }
+    
+    //check to stop for ratio
+    float stopRatio;
+    if ([self isSeeding] && (stopRatio = [self actualStopRatio]) != INVALID
+			&& [self ratio] >= stopRatio)
+    {
+        [self stopTransfer];
+        fStat = tr_torrentStat(fHandle);
+        
+        fFinishedSeeding = YES;
+        
+        [self setRatioSetting: NSOffState];
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
+>>>>>>> origin/0.7x
     }
 
     return true;
@@ -141,8 +202,35 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
     NSString * fHashString;
 
+<<<<<<< HEAD
     tr_file_stat * fFileStat;
     NSArray * fFileList, * fFlatFileList;
+=======
+        case TR_STATUS_STOPPING:
+            tempString = [NSLocalizedString(@"Stopping", "Torrent -> status string") stringByAppendingEllipsis];
+        
+            [statusString setString: tempString];
+            [shortStatusString setString: tempString];
+            
+            break;
+    }
+    
+    if (wasChecking && !fChecking)
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
+    
+    if ([self isError])
+    {
+        [statusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string") stringByAppendingString:
+                                    [self errorMessage]]];
+    }
+    
+    BOOL wasError = fError;
+    if ((fError = fStat->cannotConnect))
+    {
+        if (!wasError && [self isActive])
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
+    }
+>>>>>>> origin/0.7x
 
     NSIndexSet * fPreviousFinishedIndexes;
     NSDate * fPreviousFinishedIndexesDate;
@@ -669,12 +757,28 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (BOOL) isFolder
 {
+<<<<<<< HEAD
     return fInfo->isFolder;
+=======
+    return fStat->error != 0;
+>>>>>>> origin/0.7x
 }
 
 - (uint64_t) size
 {
+<<<<<<< HEAD
     return fInfo->totalSize;
+=======
+    if (![self isError])
+        return @"";
+    
+    NSString * error;
+    if (!(error = [NSString stringWithUTF8String: fStat->errorString])
+        && !(error = [NSString stringWithCString: fStat->errorString encoding: NSISOLatin1StringEncoding]))
+        error = NSLocalizedString(@"(unreadable error)", "Torrent -> error string unreadable");
+    
+    return error;
+>>>>>>> origin/0.7x
 }
 
 - (uint64_t) sizeLeft
@@ -942,7 +1046,11 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (BOOL) isAnyErrorOrWarning
 {
+<<<<<<< HEAD
     return fStat->error != TR_STAT_OK;
+=======
+    return [NSNumber numberWithFloat: [self ratio]];
+>>>>>>> origin/0.7x
 }
 
 - (NSString *) errorMessage

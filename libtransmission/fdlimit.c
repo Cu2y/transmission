@@ -56,8 +56,16 @@ static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error*
             return true;
         }
 
+<<<<<<< HEAD
         dbgmsg("Preallocating (sparse, fallback) failed (%d): %s", my_error->code, my_error->message);
     }
+=======
+/***********************************************************************
+ * Local prototypes
+ **********************************************************************/
+static int  OpenFile( int i, char * folder, char * name, int write );
+static void CloseFile( int i );
+>>>>>>> origin/0.7x
 
     tr_error_propagate(error, &my_error);
     return false;
@@ -493,6 +501,7 @@ tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_ind
             return TR_BAD_SYS_FILE;
         }
 
+<<<<<<< HEAD
         dbgmsg("opened '%s' writable %c", filename, writable ? 'y' : 'n');
         o->is_writable = writable;
     }
@@ -513,6 +522,19 @@ tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_ind
 tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 {
     TR_ASSERT(tr_isSession(session));
+=======
+/***********************************************************************
+ * CheckFolder
+ ***********************************************************************
+ *
+ **********************************************************************/
+static int OpenFile( int i, char * folder, char * name, int write )
+{
+    tr_openFile_t * file = &gFd->open[i];
+    struct stat sb;
+    char * path;
+    int ret;
+>>>>>>> origin/0.7x
 
     tr_socket_t s = TR_BAD_SOCKET;
     struct tr_fdInfo* gFd;
@@ -549,7 +571,17 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
             if (getsockopt(s, SOL_SOCKET, SO_SNDBUF, (void*)&i, &size) != -1)
             {
+<<<<<<< HEAD
                 tr_logAddDebug("SO_SNDBUF size is %d", i);
+=======
+                if( mkdir( path, 0777 ) )
+                {
+                    ret = tr_ioErrorFromErrno();
+                    tr_err( "Could not create folder '%s'", path );
+                    free( path );
+                    return ret;
+                }
+>>>>>>> origin/0.7x
             }
 
             i = 0;
@@ -564,6 +596,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
         }
     }
 
+<<<<<<< HEAD
     return s;
 }
 
@@ -595,7 +628,18 @@ tr_socket_t tr_fdSocketAccept(tr_session* s, tr_socket_t sockfd, tr_address* add
             tr_netCloseSocket(fd);
             fd = TR_BAD_SOCKET;
         }
+=======
+    /* Now try to really open the file */
+    file->file = open( path, write ? ( O_RDWR | O_CREAT ) : O_RDONLY, 0666 );
+    if( file->file < 0 )
+    {
+        ret = tr_ioErrorFromErrno();
+        free( path );
+        tr_err( "Could not open %s in %s (%d, %d)", name, folder, write, ret );
+        return ret;
+>>>>>>> origin/0.7x
     }
+    free( path );
 
     return fd;
 }

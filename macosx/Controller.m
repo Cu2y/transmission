@@ -2759,7 +2759,25 @@ static void removeKeRangerRansomware()
 
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
+<<<<<<< HEAD
     if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu)
+=======
+    if (![fDefaults boolForKey: @"SpeedLimitAuto"])
+        return;
+    
+    //only toggle if within first few seconds of minutes
+    NSCalendarDate * nowDate = [NSCalendarDate calendarDate];
+    if ([nowDate secondOfMinute] > AUTO_SPEED_LIMIT_SECONDS)
+        return;
+    
+    NSCalendarDate * offDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
+                        [[fDefaults objectForKey: @"SpeedLimitAutoOffDate"] timeIntervalSinceReferenceDate]];
+    
+    BOOL toggle;
+    if ([fDefaults boolForKey: @"SpeedLimit"])
+        toggle = [nowDate hourOfDay] == [offDate hourOfDay] && [nowDate minuteOfHour] == [offDate minuteOfHour];
+    else
+>>>>>>> origin/0.7x
     {
         for (NSInteger i = [menu numberOfItems]-1; i >= 0; i--)
             [menu removeItemAtIndex: i];
@@ -2813,6 +2831,7 @@ static void removeKeRangerRansomware()
 
 - (void) altSpeedToggledCallbackIsLimited: (NSDictionary *) dict
 {
+<<<<<<< HEAD
     const BOOL isLimited = [dict[@"Active"] boolValue];
 
     [fDefaults setBool: isLimited forKey: @"SpeedLimit"];
@@ -2825,6 +2844,19 @@ static void removeKeRangerRansomware()
         notification.hasActionButton = NO;
 
         [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+=======
+    Torrent * torrent = [notification object];
+    
+    [self updateTorrentsInQueue];
+    [fInfoController updateInfoStats];
+    [fInfoController updateRatioForTorrent: torrent];
+    
+    if ([fDefaults boolForKey: @"PlaySeedingSound"])
+    {
+        NSSound * sound;
+        if ((sound = [NSSound soundNamed: [fDefaults stringForKey: @"SeedingSound"]]))
+            [sound play];
+>>>>>>> origin/0.7x
     }
 }
 
@@ -4439,8 +4471,13 @@ static void removeKeRangerRansomware()
 
         case kIOMessageSystemHasPoweredOn:
             //resume sleeping transfers after we wake up
+<<<<<<< HEAD
             for (Torrent * torrent in fTorrents)
                 [torrent wakeUp];
+=======
+            [fTorrents makeObjectsPerformSelector: @selector(wakeUp)];
+            [self autoSpeedLimitChange: nil];
+>>>>>>> origin/0.7x
             break;
     }
 }
