@@ -235,6 +235,7 @@ static void removeKeRangerRansomware()
 
 @implementation Controller
 {
+<<<<<<< HEAD
     tr_session                      * fLib;
 
     NSMutableArray                  * fTorrents, * fDisplayedTorrents;
@@ -274,6 +275,11 @@ static void removeKeRangerRansomware()
 
     BOOL                            fGlobalPopoverShown;
     BOOL                            fSoundPlaying;
+=======
+    if (![fWindow isVisible] && ![[fPrefsController window] isVisible])
+        [fWindow makeKeyAndOrderFront: nil];
+    return NO;
+>>>>>>> origin/0.6
 }
 
 + (void) initialize
