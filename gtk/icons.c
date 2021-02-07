@@ -10,9 +10,27 @@
 #include <gio/gio.h>
 #include "icons.h"
 
+<<<<<<< HEAD
 #define VOID_PIXBUF_KEY "void-pixbuf"
 
 static char const* get_static_string(char const* s)
+=======
+#ifdef HAVE_GIO
+ #if GTK_CHECK_VERSION( 2, 12, 0 )
+   #define USE_GIO_ICONS
+ #endif
+#endif
+
+#ifdef USE_GIO_ICONS
+ #include <gio/gio.h>
+#endif
+
+#define VOID_PIXBUF_KEY "void-pixbuf"
+
+#ifdef USE_GIO_ICONS
+static const char *
+get_static_string( const char *s )
+>>>>>>> upstream/1.7x
 {
     static GStringChunk* static_strings = NULL;
 
@@ -72,7 +90,13 @@ static IconCache* icon_cache_new(GtkWidget* for_widget, int icon_size)
     return icons;
 }
 
+<<<<<<< HEAD
 static char const* _icon_cache_get_icon_key(GIcon* icon)
+=======
+#ifdef USE_GIO_ICONS
+static const char *
+_icon_cache_get_icon_key( GIcon * icon )
+>>>>>>> upstream/1.7x
 {
     char const* key = NULL;
 
@@ -189,6 +213,7 @@ static GdkPixbuf* icon_cache_get_mime_type_icon(IconCache* icons, char const* mi
         key = VOID_PIXBUF_KEY;
     }
 
+<<<<<<< HEAD
     g_return_val_if_fail(icons != NULL, NULL);
     GdkPixbuf* pixbuf = g_hash_table_lookup(icons->cache, key);
     if (pixbuf != NULL)
@@ -211,6 +236,29 @@ static GdkPixbuf* icon_cache_get_mime_type_icon(IconCache* icons, char const* mi
 }
 
 GdkPixbuf* gtr_get_mime_type_icon(char const* mime_type, GtkIconSize icon_size, GtkWidget* for_widget)
+=======
+    pixbuf = g_hash_table_lookup( icon_cache->cache, key );
+    if (pixbuf != NULL) {
+        g_object_ref( pixbuf );
+        g_object_unref( G_OBJECT( icon ) );
+        return pixbuf;
+    }
+
+    pixbuf = _get_icon_pixbuf( icon, icon_cache->icon_size, icon_cache->icon_theme );
+    if( pixbuf != NULL )
+        g_hash_table_insert( icon_cache->cache, (gpointer) key, g_object_ref( pixbuf ) );
+
+    g_object_unref( G_OBJECT( icon ) );
+	
+    return pixbuf;
+}
+
+#else /* USE_GIO_ICONS */
+
+static GdkPixbuf *
+icon_cache_get_mime_type_icon( IconCache  * icon_cache,
+		               const char * mime_type )
+>>>>>>> upstream/1.7x
 {
     int n;
 
@@ -255,8 +303,15 @@ GdkPixbuf* gtr_get_mime_type_icon(char const* mime_type, GtkIconSize icon_size, 
 
 char const* gtr_get_mime_type_from_filename(char const* file)
 {
+<<<<<<< HEAD
     char* tmp = g_content_type_guess(file, NULL, 0, NULL);
     char const* ret = get_static_string(tmp);
     g_free(tmp);
+=======
+#ifdef USE_GIO_ICONS
+    char * tmp = g_content_type_guess( file, NULL, 0, NULL );
+    const char * ret = get_static_string( tmp );
+    g_free( tmp );
+>>>>>>> upstream/1.7x
     return ret;
 }
