@@ -234,11 +234,53 @@ static void removeKeRangerRansomware()
 }
 
 @implementation Controller
+{
+<<<<<<< HEAD
+    tr_session                      * fLib;
 
-#warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
-@synthesize prefsController = fPrefsController;
-@synthesize messageWindowController = fMessageController;
-@synthesize fileWatcherQueue = fFileWatcherQueue;
+    NSMutableArray                  * fTorrents, * fDisplayedTorrents;
+
+    InfoWindowController            * fInfoController;
+    MessageWindowController         * fMessageController;
+
+    NSUserDefaults                  * fDefaults;
+
+    NSString                        * fConfigDirectory;
+
+    DragOverlayWindow               * fOverlayWindow;
+
+    io_connect_t                    fRootPort;
+    NSTimer                         * fTimer;
+
+    StatusBarController             * fStatusBar;
+
+    FilterBarController             * fFilterBar;
+
+    QLPreviewPanel                  * fPreviewPanel;
+    BOOL                            fQuitting;
+    BOOL                            fQuitRequested;
+    BOOL                            fPauseOnLaunch;
+
+    Badger                          * fBadger;
+
+    NSMutableArray                  * fAutoImportedNames;
+    NSTimer                         * fAutoImportTimer;
+
+    NSMutableDictionary             * fPendingTorrentDownloads;
+
+    NSMutableSet                    * fAddingTransfers;
+
+    NSMutableSet                    * fAddWindows;
+    URLSheetWindowController        * fUrlSheetController;
+
+    BOOL                            fGlobalPopoverShown;
+    BOOL                            fSoundPlaying;
+=======
+    if (![fWindow isVisible] && ![[fPrefsController window] isVisible])
+        [fWindow makeKeyAndOrderFront: nil];
+    return NO;
+>>>>>>> origin/0.6
+}
 
 + (void) initialize
 {
@@ -442,10 +484,10 @@ static void removeKeRangerRansomware()
         fInfoController = [[InfoWindowController alloc] init];
 
         //needs to be done before init-ing the prefs controller
-        fFileWatcherQueue = [[VDKQueue alloc] init];
-        [fFileWatcherQueue setDelegate: self];
+        _fileWatcherQueue = [[VDKQueue alloc] init];
+        [_fileWatcherQueue setDelegate: self];
 
-        fPrefsController = [[PrefsController alloc] initWithHandle: fLib];
+        _prefsController = [[PrefsController alloc] initWithHandle: fLib];
 
         fQuitting = NO;
         fGlobalPopoverShown = NO;
@@ -817,7 +859,7 @@ static void removeKeRangerRansomware()
     [self updateTorrentHistory];
     [fTableView saveCollapsedGroups];
     
-    fFileWatcherQueue = nil;
+    _fileWatcherQueue = nil;
 
     //complete cleanup
     tr_sessionClose(fLib);
@@ -1799,7 +1841,7 @@ static void removeKeRangerRansomware()
 
 - (void) showPreferenceWindow: (id) sender
 {
-    NSWindow * window = [fPrefsController window];
+    NSWindow * window = [_prefsController window];
     if (![window isVisible])
         [window center];
 
@@ -2723,7 +2765,25 @@ static void removeKeRangerRansomware()
 
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
+<<<<<<< HEAD
     if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu)
+=======
+    if (![fDefaults boolForKey: @"SpeedLimitAuto"])
+        return;
+    
+    //only toggle if within first few seconds of minutes
+    NSCalendarDate * nowDate = [NSCalendarDate calendarDate];
+    if ([nowDate secondOfMinute] > AUTO_SPEED_LIMIT_SECONDS)
+        return;
+    
+    NSCalendarDate * offDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
+                        [[fDefaults objectForKey: @"SpeedLimitAutoOffDate"] timeIntervalSinceReferenceDate]];
+    
+    BOOL toggle;
+    if ([fDefaults boolForKey: @"SpeedLimit"])
+        toggle = [nowDate hourOfDay] == [offDate hourOfDay] && [nowDate minuteOfHour] == [offDate minuteOfHour];
+    else
+>>>>>>> origin/0.7x
     {
         for (NSInteger i = [menu numberOfItems]-1; i >= 0; i--)
             [menu removeItemAtIndex: i];
@@ -2777,6 +2837,7 @@ static void removeKeRangerRansomware()
 
 - (void) altSpeedToggledCallbackIsLimited: (NSDictionary *) dict
 {
+<<<<<<< HEAD
     const BOOL isLimited = [dict[@"Active"] boolValue];
 
     [fDefaults setBool: isLimited forKey: @"SpeedLimit"];
@@ -2789,6 +2850,19 @@ static void removeKeRangerRansomware()
         notification.hasActionButton = NO;
 
         [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+=======
+    Torrent * torrent = [notification object];
+    
+    [self updateTorrentsInQueue];
+    [fInfoController updateInfoStats];
+    [fInfoController updateRatioForTorrent: torrent];
+    
+    if ([fDefaults boolForKey: @"PlaySeedingSound"])
+    {
+        NSSound * sound;
+        if ((sound = [NSSound soundNamed: [fDefaults stringForKey: @"SeedingSound"]]))
+            [sound play];
+>>>>>>> origin/0.7x
     }
 }
 
@@ -4403,8 +4477,13 @@ static void removeKeRangerRansomware()
 
         case kIOMessageSystemHasPoweredOn:
             //resume sleeping transfers after we wake up
+<<<<<<< HEAD
             for (Torrent * torrent in fTorrents)
                 [torrent wakeUp];
+=======
+            [fTorrents makeObjectsPerformSelector: @selector(wakeUp)];
+            [self autoSpeedLimitChange: nil];
+>>>>>>> origin/0.7x
             break;
     }
 }
@@ -4632,7 +4711,7 @@ static void removeKeRangerRansomware()
                     break;
 
                 case TR_RPC_SESSION_CHANGED:
-                    [fPrefsController rpcUpdatePrefs];
+                    [_prefsController rpcUpdatePrefs];
                     break;
 
                 case TR_RPC_SESSION_CLOSE:

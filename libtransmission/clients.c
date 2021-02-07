@@ -221,8 +221,24 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         }
         else if (strncmp(chid + 1, "BT", 2) == 0)
         {
+<<<<<<< HEAD
             tr_snprintf(buf, buflen, "BitTorrent %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 1),
                 getMnemonicEnd(id[6]));
+=======
+            if( !memcmp( &id[4], "A0C", 3 ) )
+            {
+                asprintf( &ret, "Bits on Wheels 1.0.6" );
+            }
+            else if( !memcmp( &id[4], "A0B", 3 ) )
+            {
+                asprintf( &ret, "Bits on Wheels 1.0.5" );
+            }
+            else
+            {
+                asprintf( &ret, "Bits on Wheels (%c%c%c)",
+                        id[4], id[5], id[6] );
+            }
+>>>>>>> origin/0.7x
         }
         else if (strncmp(chid + 1, "UM", 2) == 0)
         {
@@ -319,7 +335,24 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         {
             four_digits(buf, buflen, "EBit", id + 3);
         }
+<<<<<<< HEAD
         else if (strncmp(chid + 1, "DE", 2) == 0)
+=======
+        else if( !memcmp( &id[1], "BF", 2 ) )
+        {
+            asprintf( &ret, "Bitflu (%d/%d/%02d)",
+                      charToInt( id[6] ),
+                      charToInt( id[4] ) * 10 + charToInt( id[5] ),
+                      charToInt( id[3] ) );
+        }
+        else if( !memcmp( &id[1], "FT", 2 ) )
+        {
+            asprintf( &ret, "FoxTorrent (%c%c%c%c)",
+                      id[3], id[4], id[5], id[6] );
+        }
+        
+        if( ret )
+>>>>>>> origin/0.7x
         {
             four_digits(buf, buflen, "Deluge", id + 3);
         }

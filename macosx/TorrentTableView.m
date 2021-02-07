@@ -545,6 +545,7 @@
         if ([[[NSPasteboard generalPasteboard] types] containsObject: NSURLPboardType])
             return YES;
 
+<<<<<<< HEAD
         NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: @[[NSString class]] options: nil];
         if (items)
         {
@@ -577,6 +578,28 @@
         else
             [fController resumeTorrents: @[torrent]];
     }
+=======
+    NSArray * tempTorrents = [fTorrents sortedArrayUsingDescriptors: descriptors];
+    [descriptors release];
+    
+    //select torrent closest to text that isn't before text alphabetically
+    int row;
+    NSEnumerator * enumerator = [tempTorrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        if ([[torrent name] caseInsensitiveCompare: text] != NSOrderedAscending)
+        {
+            row = [fTorrents indexOfObject: torrent];
+            break;
+        }
+    
+    //select last torrent alphabetically if no match found
+    if (!torrent)
+        row = [fTorrents indexOfObject: [tempTorrents lastObject]];
+    
+    [self selectRow: row byExtendingSelection: NO];
+    [self scrollRowToVisible: row];
+>>>>>>> origin/0.7x
 }
 
 - (void) displayTorrentActionPopoverForEvent: (NSEvent *) event
