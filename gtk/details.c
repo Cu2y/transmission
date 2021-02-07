@@ -33,6 +33,7 @@ static GQuark URL_ENTRY_KEY = 0;
 
 struct DetailsImpl
 {
+<<<<<<< HEAD
     GtkWidget* dialog;
 
     GtkWidget* honor_limits_check;
@@ -99,6 +100,75 @@ struct DetailsImpl
 
     GSList* ids;
     TrCore* core;
+=======
+    GtkWidget * peersPage;
+    GtkWidget * trackerPage;
+    GtkWidget * activityPage;
+
+    GtkWidget * honorLimitsCheck;
+    GtkWidget * upLimitedCheck;
+    GtkWidget * upLimitSpin;
+    GtkWidget * downLimitedCheck;
+    GtkWidget * downLimitSpin;
+    GtkWidget * bandwidthCombo;
+    GtkWidget * seedGlobalRadio;
+    GtkWidget * seedForeverRadio;
+    GtkWidget * seedCustomRadio;
+    GtkWidget * seedCustomSpin;
+    GtkWidget * maxPeersSpin;
+
+    guint honorLimitsCheckTag;
+    guint upLimitedCheckTag;
+    guint downLimitedCheckTag;
+    guint downLimitSpinTag;
+    guint upLimitSpinTag;
+    guint bandwidthComboTag;
+    guint seedForeverRadioTag;
+    guint seedGlobalRadioTag;
+    guint seedCustomRadioTag;
+    guint seedCustomSpinTag;
+    guint maxPeersSpinTag;
+
+    GtkWidget * size_lb;
+    GtkWidget * state_lb;
+    GtkWidget * have_lb;
+    GtkWidget * dl_lb;
+    GtkWidget * ul_lb;
+    GtkWidget * ratio_lb;
+    GtkWidget * error_lb;
+    GtkWidget * date_started_lb;
+    GtkWidget * last_activity_lb;
+
+    GtkWidget * hash_lb;
+    GtkWidget * privacy_lb;
+    GtkWidget * origin_lb;
+    GtkWidget * destination_lb;
+    GtkTextBuffer * comment_buffer;
+
+    GHashTable * peer_hash;
+    GHashTable * webseed_hash;
+    GtkListStore * peer_store;
+    GtkListStore * webseed_store;
+    GtkWidget * seeders_lb;
+    GtkWidget * leechers_lb;
+    GtkWidget * completed_lb;
+    GtkWidget * webseed_view;
+
+    GtkWidget * tracker_list;
+    GtkWidget * last_scrape_time_lb;
+    GtkWidget * last_scrape_response_lb;
+    GtkWidget * next_scrape_countdown_lb;
+    GtkWidget * last_announce_url_lb;
+    GtkWidget * last_announce_time_lb;
+    GtkWidget * last_announce_response_lb;
+    GtkWidget * next_announce_countdown_lb;
+    GtkWidget * manual_announce_countdown_lb;
+
+    GtkWidget * file_list;
+
+    GSList * ids;
+    TrCore * core;
+>>>>>>> upstream/1.7x
     guint periodic_refresh_tag;
 
     GString* gstr;
@@ -2331,10 +2401,44 @@ static void refreshTracker(struct DetailsImpl* di, tr_torrent** torrents, int n)
         while (gtk_tree_model_iter_next(model, &iter));
     }
 
+<<<<<<< HEAD
     /* step 3: add any new trackers */
     for (int i = 0; i < n; ++i)
     {
         int const jn = statCount[i];
+=======
+    store  = di->peer_store = peer_store_new( );
+    m = gtk_tree_model_sort_new_with_model( GTK_TREE_MODEL( store ) );
+    gtk_tree_sortable_set_sort_column_id( GTK_TREE_SORTABLE( m ),
+                                          PEER_COL_PROGRESS,
+                                          GTK_SORT_DESCENDING );
+#if GTK_CHECK_VERSION( 2,12,0 )
+    v = GTK_WIDGET( g_object_new( GTK_TYPE_TREE_VIEW,
+                                  "model",  m,
+                                  "rules-hint", TRUE,
+                                  "has-tooltip", TRUE,
+                                  NULL ) );
+#else
+    v = GTK_WIDGET( g_object_new( GTK_TYPE_TREE_VIEW,
+                                  "model",  m,
+                                  "rules-hint", TRUE,
+                                  NULL ) );
+#endif
+
+#if GTK_CHECK_VERSION( 2,12,0 )
+    g_signal_connect( v, "query-tooltip",
+                      G_CALLBACK( onPeerViewQueryTooltip ), NULL );
+#endif
+    g_object_unref( store );
+    g_signal_connect( v, "button-release-event",
+                      G_CALLBACK( on_tree_view_button_released ), NULL );
+
+    for( i=0; i<G_N_ELEMENTS( view_columns ); ++i )
+    {
+        const int col = view_columns[i];
+        const char * t = getPeerColumnName( col );
+        int sort_col = col;
+>>>>>>> upstream/1.7x
 
         for (int j = 0; j < jn; ++j)
         {
@@ -2520,10 +2624,27 @@ static void on_edit_trackers_response(GtkDialog* dialog, int response, gpointer 
     }
 }
 
+<<<<<<< HEAD
 static void get_editable_tracker_list(GString* gstr, tr_torrent const* tor)
 {
     int tier = 0;
     tr_info const* inf = tr_torrentInfo(tor);
+=======
+    /* last_announce_url_lb */
+    if( n<1 )
+        str = none;
+    else {
+        const char * baseline = stats[0]->announceURL;
+        for( i=1; i<n; ++i)
+            if( strcmp( baseline, stats[i]->announceURL ) )
+                break;
+        if( i==n )
+            str = baseline;
+        else
+            str = mixed;
+    }
+    gtk_label_set_text( GTK_LABEL( di->last_announce_url_lb ), str );
+>>>>>>> upstream/1.7x
 
     for (unsigned int i = 0; i < inf->trackerCount; ++i)
     {
@@ -2661,9 +2782,16 @@ static void on_add_tracker_response(GtkDialog* dialog, int response, gpointer gd
     }
 }
 
+<<<<<<< HEAD
 static void on_tracker_list_add_button_clicked(GtkButton const* button, gpointer gdi)
 {
     TR_UNUSED(button);
+=======
+        l = gtk_label_new( NULL );
+        gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
+        di->last_announce_url_lb = l;
+        hig_workarea_add_row( t, &row, _( "Tracker:" ), l, NULL );
+>>>>>>> upstream/1.7x
 
     struct DetailsImpl* di = gdi;
     tr_torrent const* tor = tracker_list_get_current_torrent(di);
