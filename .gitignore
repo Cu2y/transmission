@@ -21,3 +21,4 @@ po/*.mo
 third-party/miniupnp/miniupnpcstrings.h
 web/public_html/transmission-app.js.map
 third-party/libnatpmp
+third-party/libnatpmp
