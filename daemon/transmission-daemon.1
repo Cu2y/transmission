@@ -53,6 +53,7 @@ the daemon will load them into Transmission.
 Do not watch for new .torrent files.
 .It Fl B Fl -no-blocklist
 Disble blocklists.
+<<<<<<< HEAD
 .It Fl d
 Dump transmission-daemon's settings to stderr.
 .It Fl f Fl -foreground
@@ -60,12 +61,20 @@ Run in the foreground and print errors to stderr.
 .It Fl g Fl -config-dir Ar directory
 Where to look for configuration files. This can be used to swap between using the cli, daemon, gtk, and qt clients.
 See https://github.com/transmission/transmission/wiki/Configuration-Files for more information.
+=======
+.It Fl f Fl -foreground
+Run in the foreground and print errors to stderr.
+.It Fl g Fl -config-dir Ar directory
+Where to look for configuration files.  This can be used to swap between using the cli, daemon, gtk, and qt clients.
+See http://trac.transmissionbt.com/wiki/ConfigFiles for more information.
+>>>>>>> upstream/1.7x
 .It Fl er Fl -encryption-required
 Encrypt all peer connections.
 .It Fl ep Fl -encryption-preferred
 Prefer encrypted peer connections.
 .It Fl et Fl -encryption-tolerated
 Prefer unencrypted peer connections.
+<<<<<<< HEAD
 .It Fl gsr Fl -global-seedratio Ar ratio
 All torrents, unless overridden by a per-torrent setting, should seed until a specific
 .Ar ratio
@@ -79,12 +88,20 @@ When adding new torrents, store their contents in
 until the torrent is done.
 .It Fl -no-incomplete-dir
 Don't store incomplete torrents in a different directory.
+=======
+.It Fl h Fl -help
+Print command-line option descriptions.
+>>>>>>> upstream/1.7x
 .It Fl i Fl -bind-address-ipv4
 Listen for IPv4 BitTorrent connections on a specific address. Only one IPv4 listening address is allowed. Default: 0.0.0.0 (All addresses)
 .It Fl I Fl -bind-address-ipv6
 Listen for IPv6 BitTorrent connections on a specific address. Only one IPv6 listening address is allowed. Default: :: (All addresses)
 .It Fl r Fl -rpc-bind-address
+<<<<<<< HEAD
 Listen for RPC connections on a specific address. This must be an IPv4 or IPv6 address. Only one RPC listening address is allowed. Default: 0.0.0.0 (All IPv4 addresses)
+=======
+Listen for RPC connections on a specific address. This must be an IPv4 address. Only one RPC listening address is allowed. Default: 0.0.0.0 (All addresses)
+>>>>>>> upstream/1.7x
 .It Fl -paused
 Pause all torrents on startup
 .It Fl L Fl -peerlimit-global Ar limit
@@ -95,6 +112,7 @@ Peer limit per torrent. Useful on embedded systems where the default might be un
 Enable portmapping via NAT-PMP or UPnP
 .It Fl M Fl -no-portmap
 Disable portmapping
+<<<<<<< HEAD
 .It Fl o Fl -dht
 Enable distributed hash table (DHT).
 .It Fl O Fl -no-dht
@@ -102,6 +120,11 @@ Disable distribued hash table (DHT).
 .It Fl p Fl -port Ar port
 Port to open and listen for RPC requests on. Default: 9091
 .It Fl P Fl -peerport Ar port
+=======
+.It Fl p Fl -port Ar port
+Port to open and listen for RPC requests on.  Default: 9091
+.It Fl P, -peerport Ar port
+>>>>>>> upstream/1.7x
 Port to listen for incoming peers on. Default: 51413
 .It Fl t Fl -auth
 Require clients to authenticate themselves.
@@ -118,6 +141,7 @@ Used for client authentication.
 Used for client authentication.
 .It Fl V Fl -version
 Show version number and exit
+<<<<<<< HEAD
 .It Fl -utp
 Enable uTP for peer connections.
 .It Fl -no-utp
@@ -132,6 +156,10 @@ Show error messages
 Show error and info messages
 .It Fl -log-debug
 Show error, info, and debug messages
+=======
+.It Fl w Fl -download-dir
+Where to store downloaded data.
+>>>>>>> upstream/1.7x
 .El
 .Sh ENVIRONMENT
 .Bl -tag -width Fl
@@ -157,7 +185,11 @@ See https://github.com/transmission/transmission/wiki/Configuration-Files for mo
 .An Eric Petit ,
 .An Mitchell Livingston ,
 and
+<<<<<<< HEAD
 .An Mike Gelfand .
+=======
+.An Mitchell Livingston .
+>>>>>>> upstream/1.7x
 .Sh SEE ALSO
 .Xr transmission-create 1 ,
 .Xr transmission-daemon 1 ,
