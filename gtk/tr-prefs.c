@@ -1121,6 +1121,7 @@ static void onPortTested(TrCore* core, gboolean isOpen, gpointer vdata)
 
 static void onPortTest(GtkButton* button, gpointer vdata)
 {
+<<<<<<< HEAD
     TR_UNUSED(button);
 
     struct network_page_data* data = vdata;
@@ -1134,6 +1135,15 @@ static void onPortTest(GtkButton* button, gpointer vdata)
     }
 
     gtr_core_port_test(data->core);
+=======
+    struct network_page_data * data = vdata;
+    gtk_widget_set_sensitive( data->portButton, FALSE );
+    gtk_widget_set_sensitive( data->portSpin, FALSE );
+    gtk_label_set_markup( GTK_LABEL( data->portLabel ), _( "<i>Testing...</i>" ) );
+    if( !data->portTag )
+        data->portTag = g_signal_connect( data->core, "port-tested", G_CALLBACK(onPortTested), data );
+    tr_core_port_test( data->core );
+>>>>>>> upstream/1.7x
 }
 
 static GtkWidget* networkPage(GObject* core)
