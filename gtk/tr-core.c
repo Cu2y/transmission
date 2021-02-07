@@ -497,9 +497,31 @@ static int compare_by_age(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpoin
     gtk_tree_model_get(m, a, MC_TORRENT, &ta, -1);
     gtk_tree_model_get(m, b, MC_TORRENT, &tb, -1);
 
+<<<<<<< HEAD
     if (ret == 0)
     {
         ret = compare_time(tr_torrentStatCached(ta)->addedDate, tr_torrentStatCached(tb)->addedDate);
+=======
+    if( !strcmp( mode, "sort-by-activity" ) )
+        sort_func = compareByActivity;
+    else if( !strcmp( mode, "sort-by-age" ) )
+        sort_func = compareByAge;
+    else if( !strcmp( mode, "sort-by-progress" ) )
+        sort_func = compareByProgress;
+    else if( !strcmp( mode, "sort-by-time-left" ) )
+        sort_func = compareByETA;
+    else if( !strcmp( mode, "sort-by-ratio" ) )
+        sort_func = compareByRatio;
+    else if( !strcmp( mode, "sort-by-state" ) )
+        sort_func = compareByState;
+    else if( !strcmp( mode, "sort-by-tracker" ) )
+        sort_func = compareByTracker;
+    else if( !strcmp( mode, "sort-by-size" ) )
+        sort_func = compareBySize;
+    else {
+        sort_func = compareByName;
+        type = isReversed ? GTK_SORT_DESCENDING : GTK_SORT_ASCENDING;
+>>>>>>> upstream/1.7x
     }
 
     if (ret == 0)
