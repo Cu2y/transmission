@@ -155,9 +155,103 @@ static void show_details_dialog_for_selected_torrents(struct cbdata* data)
     GSList* ids = get_selected_torrent_ids(data);
     char* key = get_details_dialog_key(ids);
 
+<<<<<<< HEAD
     for (GSList* l = data->details; dialog == NULL && l != NULL; l = l->next)
     {
         if (g_strcmp0(key, g_object_get_data(l->data, "key")) == 0)
+=======
+static GList *
+readargs( int argc, char ** argv, gboolean * sendquit, gboolean * paused );
+static gboolean
+sendremote( GList * files, gboolean sendquit );
+static void
+gtksetup( int * argc, char *** argv );
+static void
+appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused );
+static void
+winsetup( struct cbdata * cbdata, TrWindow * wind );
+static void
+iconclick( struct cbdata * cbdata );
+static void
+makeicon( struct cbdata * cbdata );
+static gboolean
+winclose( GtkWidget * widget, GdkEvent * event, gpointer gdata );
+static void
+wannaquit( void * vdata );
+static gboolean
+exitcheck(gpointer gdata);
+static void
+setupdrag(GtkWidget *widget, struct cbdata *data);
+static void
+gotdrag(GtkWidget *widget, GdkDragContext *dc, gint x, gint y,
+        GtkSelectionData *sel, guint info, guint time, gpointer gdata);
+
+static void
+readinitialprefs( struct cbdata * cbdata );
+static void
+prefschanged( GtkWidget * widget, int id, gpointer data );
+static void
+setpex( tr_torrent_t * tor, void * arg );
+static gboolean
+updatemodel(gpointer gdata);
+static void
+boolwindclosed(GtkWidget *widget, gpointer gdata);
+static void
+windact(GtkWidget *widget, int action, gpointer gdata);
+static GList *
+getselection( struct cbdata * cbdata );
+static void
+handleaction( struct cbdata *data, int action );
+
+static void
+addtorrents(void *vdata, void *state, GList *files,
+            const char *dir, guint flags);
+static void
+savetorrents(struct cbdata *data);
+static void
+safepipe(void);
+static void
+setupsighandlers(void);
+static void
+fatalsig(int sig);
+
+int
+main( int argc, char ** argv )
+{
+    GtkWindow  * mainwind;
+    char       * err;
+    benc_val_t * state;
+    GList      * argfiles;
+    gboolean     didinit, didlock, sendquit, startpaused;
+
+    safepipe();                 /* ignore SIGPIPE */
+    argfiles = readargs( argc, argv, &sendquit, &startpaused );
+    didinit = cf_init( tr_getPrefsDirectory(), NULL );
+    didlock = FALSE;
+    if( didinit )
+    {
+        /* maybe send remote commands, also try cf_lock() */
+        didlock = sendremote( argfiles, sendquit );
+    }
+    setupsighandlers();         /* set up handlers for fatal signals */
+    gtksetup( &argc, &argv );   /* set up gtk and gettext */
+
+    if( ( didinit || cf_init( tr_getPrefsDirectory(), &err ) ) &&
+        ( didlock || cf_lock( &err ) ) )
+    {
+        /* create main window now to be a parent to any error dialogs */
+        mainwind = GTK_WINDOW( tr_window_new() );
+
+        /* try to load prefs and saved state */
+        cf_loadprefs( &err );
+        if( NULL != err )
+        {
+            errmsg( mainwind, "%s", err );
+            g_free( err );
+        }
+        state = cf_loadstate( &err );
+        if( NULL != err )
+>>>>>>> origin/0.7x
         {
             dialog = l->data;
         }
@@ -785,12 +879,18 @@ static void placeWindowFromPrefs(GtkWindow* window)
         (int)gtr_pref_int_get(TR_KEY_main_window_y));
 }
 
+<<<<<<< HEAD
 static void presentMainWindow(struct cbdata* cbdata)
+=======
+static void
+iconclick( struct cbdata * cbdata )
+>>>>>>> origin/0.7x
 {
     GtkWindow* window = cbdata->wind;
 
     if (cbdata->is_iconified)
     {
+<<<<<<< HEAD
         cbdata->is_iconified = false;
 
         gtk_window_set_skip_taskbar_hint(window, FALSE);
@@ -804,6 +904,18 @@ static void presentMainWindow(struct cbdata* cbdata)
 
     gtr_window_present(window);
     gdk_window_raise(gtk_widget_get_window(GTK_WIDGET(window)));
+=======
+        /* close window  */
+        winclose( NULL, NULL, cbdata );
+    }
+    else
+    {
+        /* create window */
+        win = tr_window_new();
+        winsetup( cbdata, TR_WINDOW( win ) );
+        tr_window_show( TR_WINDOW( win ) );
+    }
+>>>>>>> origin/0.7x
 }
 
 static void hideMainWindow(struct cbdata* cbdata)
@@ -1459,10 +1571,138 @@ static void open_folder_foreach(GtkTreeModel* model, GtkTreePath* path, GtkTreeI
     gtr_core_open_folder(core, id);
 }
 
+<<<<<<< HEAD
 static gboolean on_message_window_closed(void)
 {
     gtr_action_set_toggled("toggle-message-log", FALSE);
     return FALSE;
+=======
+static void
+handleaction( struct cbdata * data, int act )
+{
+  GList *rows, *ii;
+  GtkTreePath *path;
+  GtkTreeIter iter;
+  TrTorrent *tor;
+  int status;
+  gboolean changed;
+  GtkWidget * win;
+
+  g_assert( ACTION_COUNT > act );
+
+  switch( act )
+  {
+      case ACT_OPEN:
+          makeaddwind( data->wind, addtorrents, data );
+          return;
+      case ACT_PREF:
+          if( NULL != data->prefs )
+          {
+              return;
+          }
+          data->prefs = tr_prefs_new_with_parent( data->wind );
+          g_signal_connect( data->prefs, "prefs-changed",
+                            G_CALLBACK( prefschanged ), data );
+          g_signal_connect( data->prefs, "destroy",
+                            G_CALLBACK( gtk_widget_destroyed ), &data->prefs );
+          gtk_widget_show( GTK_WIDGET( data->prefs ) );
+          return;
+      case ACT_DEBUG:
+          if( !data->msgwinopen )
+          {
+              data->msgwinopen = TRUE;
+              win = msgwin_create();
+              g_signal_connect( win, "destroy", G_CALLBACK( boolwindclosed ),
+                                &data->msgwinopen );
+          }
+          return;
+      case ACT_ICON:
+          iconclick( data );
+          return;
+      case ACT_CLOSE:
+          if( NULL != data->wind )
+          {
+              winclose( NULL, NULL, data );
+          }
+          return;
+      case ACT_QUIT:
+          askquit( data->wind, wannaquit, data );
+          return;
+      case ACT_SEPARATOR1:
+      case ACT_SEPARATOR2:
+      case ACT_SEPARATOR3:
+          return;
+      case ACT_START:
+      case ACT_STOP:
+      case ACT_DELETE:
+      case ACT_INFO:
+      case ACTION_COUNT:
+          break;
+  }
+
+  /* get a list of references to selected rows */
+  rows = getselection( data );
+
+  changed = FALSE;
+  for(ii = rows; NULL != ii; ii = ii->next) {
+    if(NULL != (path = gtk_tree_row_reference_get_path(ii->data)) &&
+       gtk_tree_model_get_iter(data->model, &iter, path)) {
+      gtk_tree_model_get(data->model, &iter, MC_TORRENT, &tor,
+                         MC_STAT, &status, -1);
+      if( ACT_ISAVAIL( actions[act].flags, status ) )
+
+      {
+          switch( act )
+          {
+              case ACT_START:
+                  tr_torrentStart( tr_torrent_handle( tor ) );
+                  changed = TRUE;
+                  break;
+              case ACT_STOP:
+                  tr_torrentStop( tr_torrent_handle( tor ) );
+                  changed = TRUE;
+                  break;
+              case ACT_DELETE:
+                  /* tor will be unref'd in the politely_stopped handler */
+                  g_object_ref( tor );
+                  tr_torrent_stop_politely( tor );
+                  if( TR_FLAG_SAVE & tr_torrent_info( tor )->flags )
+                  {
+                      tr_torrentRemoveSaved( tr_torrent_handle( tor ) );
+                  }
+                  gtk_list_store_remove( GTK_LIST_STORE( data->model ),
+                                         &iter );
+                  changed = TRUE;
+                  break;
+              case ACT_INFO:
+                  makeinfowind( data->wind, data->model, path, tor );
+                  break;
+              case ACT_OPEN:
+              case ACT_PREF:
+              case ACT_DEBUG:
+              case ACT_ICON:
+              case ACT_CLOSE:
+              case ACT_QUIT:
+              case ACT_SEPARATOR1:
+              case ACT_SEPARATOR2:
+              case ACT_SEPARATOR3:
+              case ACTION_COUNT:
+                  break;
+          }
+      }
+      g_object_unref(tor);
+    }
+    if(NULL != path)
+      gtk_tree_path_free(path);
+    gtk_tree_row_reference_free(ii->data);
+  }
+  g_list_free(rows);
+
+  if(changed) {
+    savetorrents(data);
+    updatemodel(data);
+  }
+>>>>>>> origin/0.7x
 }
 
 static void accumulate_selected_torrents(GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* iter, gpointer gdata)

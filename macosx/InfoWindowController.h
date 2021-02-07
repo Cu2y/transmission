@@ -58,6 +58,8 @@
 
 - (void) setTab: (id) sender;
 
+- (void) updateRatioForTorrent: (Torrent *) torrent;
+
 - (void) setNextTab;
 - (void) setPreviousTab;
 

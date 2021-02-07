@@ -135,6 +135,7 @@ typedef enum
 
 - (void) dealloc
 {
+<<<<<<< HEAD
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
     if ([fViewController respondsToSelector: @selector(saveViewSize)])
@@ -142,6 +143,134 @@ typedef enum
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents
+=======
+    if ([fTorrents count] > 0)
+    {
+        Torrent * torrent;
+        
+        //set bandwidth limits
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        torrent = [enumerator nextObject]; //first torrent
+        
+        int checkUpload = [torrent checkUpload],
+            checkDownload = [torrent checkDownload],
+            uploadLimit = [torrent uploadLimit],
+            downloadLimit = [torrent downloadLimit];
+        
+        while ((checkUpload != INVALID || uploadLimit != INVALID
+                || checkDownload != INVALID || downloadLimit != INVALID)
+                && (torrent = [enumerator nextObject]))
+        {
+            if (checkUpload != INVALID && checkUpload != [torrent checkUpload])
+                checkUpload = INVALID;
+            
+            if (uploadLimit != INVALID && uploadLimit != [torrent uploadLimit])
+                uploadLimit = INVALID;
+            
+            if (checkDownload != INVALID && checkDownload != [torrent checkDownload])
+                checkDownload = INVALID;
+            
+            if (downloadLimit != INVALID && downloadLimit != [torrent downloadLimit])
+                downloadLimit = INVALID;
+        }
+        
+        [fUploadLimitPopUp setEnabled: YES];
+        [fUploadLimitPopUp selectItemAtIndex: [self stateSettingToPopUpIndex: checkUpload]];
+        [fUploadLimitLabel setHidden: checkUpload != NSOnState];
+        [fUploadLimitField setHidden: checkUpload != NSOnState];
+        if (uploadLimit != INVALID)
+            [fUploadLimitField setIntValue: uploadLimit];
+        else
+            [fUploadLimitField setStringValue: @""];
+        
+        [fDownloadLimitPopUp setEnabled: YES];
+        [fDownloadLimitPopUp selectItemAtIndex: [self stateSettingToPopUpIndex: checkDownload]];
+        [fDownloadLimitLabel setHidden: checkDownload != NSOnState];
+        [fDownloadLimitField setHidden: checkDownload != NSOnState];
+        if (downloadLimit != INVALID)
+            [fDownloadLimitField setIntValue: downloadLimit];
+        else
+            [fDownloadLimitField setStringValue: @""];
+        
+        //set ratio settings
+        enumerator = [fTorrents objectEnumerator];
+        torrent = [enumerator nextObject]; //first torrent
+        
+        int checkRatio = [torrent ratioSetting];
+        float ratioLimit = [torrent ratioLimit];
+        
+        while ((checkRatio != INVALID || checkRatio != INVALID)
+                && (torrent = [enumerator nextObject]))
+        {
+            if (checkRatio != INVALID && checkRatio != [torrent ratioSetting])
+                checkRatio = INVALID;
+            
+            if (ratioLimit != INVALID && ratioLimit != [torrent ratioLimit])
+                ratioLimit = INVALID;
+        }
+        
+        [fRatioPopUp setEnabled: YES];
+        [fRatioPopUp selectItemAtIndex: [self stateSettingToPopUpIndex: checkRatio]];
+        [fRatioLimitField setHidden: checkRatio != NSOnState];
+        if (ratioLimit != INVALID)
+            [fRatioLimitField setFloatValue: ratioLimit];
+        else
+            [fRatioLimitField setStringValue: @""];
+		
+		//set pex check
+		enumerator = [fTorrents objectEnumerator];
+        torrent = [enumerator nextObject]; //first torrent
+		
+		BOOL pexEnabled = ![torrent privateTorrent];
+		int pexState = [torrent pex] ? NSOnState : NSOffState;
+		
+		while ((pexEnabled || pexState != NSMixedState)
+                && (torrent = [enumerator nextObject]))
+        {
+            if (pexEnabled)
+                pexEnabled = ![torrent privateTorrent];
+            
+            if (pexState != NSMixedState && pexState != ([torrent pex] ? NSOnState : NSOffState))
+                pexState = NSMixedState;
+        }
+		
+		[fPexCheck setEnabled: pexEnabled];
+		[fPexCheck setState: pexState];
+    }
+    else
+    {
+        [fUploadLimitPopUp setEnabled: NO];
+        [fUploadLimitPopUp selectItemAtIndex: -1];
+        [fUploadLimitField setHidden: YES];
+        [fUploadLimitLabel setHidden: YES];
+        [fUploadLimitField setStringValue: @""];
+        
+        [fDownloadLimitPopUp setEnabled: NO];
+        [fDownloadLimitPopUp selectItemAtIndex: -1];
+        [fDownloadLimitField setHidden: YES];
+        [fDownloadLimitLabel setHidden: YES];
+        [fDownloadLimitField setStringValue: @""];
+        
+        [fRatioPopUp setEnabled: NO];
+        [fRatioPopUp selectItemAtIndex: -1];
+        [fRatioLimitField setHidden: YES];
+        [fRatioLimitField setStringValue: @""];
+		
+		[fPexCheck setEnabled: NO];
+        [fPexCheck setState: NSOffState];
+    }
+    
+    [self updateInfoStats];
+}
+
+- (void) updateRatioForTorrent: (Torrent *) torrent
+{
+    if ([fTorrents containsObject: torrent])
+        [self updateInfoSettings];
+}
+
+- (int) stateSettingToPopUpIndex: (int) index
+>>>>>>> origin/0.7x
 {
     if (fTorrents && [fTorrents isEqualToArray: torrents])
         return;
