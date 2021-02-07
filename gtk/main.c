@@ -380,6 +380,7 @@ static void refresh_actions_soon(gpointer gdata)
     }
 }
 
+<<<<<<< HEAD
 static void on_selection_changed(GtkTreeSelection const* s, gpointer gdata)
 {
     TR_UNUSED(s);
@@ -410,16 +411,36 @@ static void register_magnet_link_handler(void)
     g_app_info_set_as_default_for_type(app, content_type, &error);
 
     if (error != NULL)
+=======
+static sig_atomic_t global_sigcount = 0;
+static struct cbdata * sighandler_cbdata = NULL;
+
+static void
+signal_handler( int sig )
+{
+    if( ++global_sigcount > 1 )
+>>>>>>> upstream/1.7x
     {
         g_warning(_("Error registering Transmission as a %s handler: %s"), content_type, error->message);
         g_error_free(error);
     }
+<<<<<<< HEAD
 
     g_clear_object(&app);
+=======
+    else switch( sig )
+    {
+        case SIGINT:
+            g_message( _( "Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck." ), sig );
+            doAction( "quit", sighandler_cbdata );
+            break;
+    }
+>>>>>>> upstream/1.7x
 }
 
 static void ensure_magnet_handler_exists(void)
 {
+<<<<<<< HEAD
     if (!has_magnet_link_handler())
     {
         register_magnet_link_handler();
@@ -449,6 +470,9 @@ static void on_main_window_size_allocated(GtkWidget* gtk_window, GtkAllocation c
         gtr_pref_int_set(TR_KEY_main_window_width, w);
         gtr_pref_int_set(TR_KEY_main_window_height, h);
     }
+=======
+    signal( SIGINT, signal_handler );
+>>>>>>> upstream/1.7x
 }
 
 /***
@@ -669,7 +693,15 @@ static void on_activate(GApplication* app, struct cbdata* cbdata)
      * user started Transmission minimized, ignore that initial signal... */
     if (cbdata->is_iconified && cbdata->activation_count == 1)
     {
+<<<<<<< HEAD
         return;
+=======
+        /* There's already another copy of Transmission running,
+         * so tell it to present its window to the user */
+        err = NULL;
+        if( !gtr_dbus_present_window( ) )
+            err = g_strdup( _( "Transmission is already running, but is not responding.  To start a new session, you must first close the existing Transmission process." ) );
+>>>>>>> upstream/1.7x
     }
 
     gtr_action_activate("present-main-window");
@@ -699,8 +731,18 @@ static void on_open(GApplication const* application, GFile** f, gint file_count,
 
     open_files(files, gdata);
 
+<<<<<<< HEAD
     g_slist_free(files);
 }
+=======
+        sighandler_cbdata = cbdata;
+
+        /* ensure the directories are created */
+        if(( str = pref_string_get( PREF_KEY_DIR_WATCH )))
+            gtr_mkdir_with_parents( str, 0777 );
+        if(( str = pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR )))
+            gtr_mkdir_with_parents( str, 0777 );
+>>>>>>> upstream/1.7x
 
 /***
 ****
@@ -843,6 +885,7 @@ static void app_setup(GtkWindow* wind, struct cbdata* cbdata)
     }
     else
     {
+<<<<<<< HEAD
         gtk_window_set_skip_taskbar_hint(cbdata->wind, cbdata->icon != NULL);
         cbdata->is_iconified = FALSE; // ensure that the next toggle iconifies
         gtr_action_set_toggled("toggle-main-window", FALSE);
@@ -868,6 +911,12 @@ static void app_setup(GtkWindow* wind, struct cbdata* cbdata)
         default:
             exit(0);
         }
+=======
+        gtk_window_set_skip_taskbar_hint( cbdata->wind,
+                                          cbdata->icon != NULL );
+        cbdata->isIconified = FALSE; // ensure that the next toggle iconifies
+        action_toggle( "toggle-main-window", FALSE );
+>>>>>>> upstream/1.7x
     }
 }
 
@@ -1023,6 +1072,7 @@ static void main_window_setup(struct cbdata* cbdata, GtkWindow* wind)
     g_signal_connect(w, "drag-data-received", G_CALLBACK(on_drag_data_received), cbdata);
 }
 
+<<<<<<< HEAD
 static gboolean on_session_closed(gpointer gdata)
 {
     GSList* tmp;
@@ -1031,6 +1081,12 @@ static gboolean on_session_closed(gpointer gdata)
     tmp = g_slist_copy(cbdata->details);
     g_slist_foreach(tmp, (GFunc)(GCallback)gtk_widget_destroy, NULL);
     g_slist_free(tmp);
+=======
+static gboolean
+onSessionClosed( gpointer gdata )
+{
+    struct cbdata * cbdata = gdata;
+>>>>>>> upstream/1.7x
 
     if (cbdata->prefs != NULL)
     {
@@ -1049,6 +1105,7 @@ static gboolean on_session_closed(gpointer gdata)
         g_object_unref(cbdata->icon);
     }
 
+<<<<<<< HEAD
     g_slist_foreach(cbdata->error_list, (GFunc)(GCallback)g_free, NULL);
     g_slist_free(cbdata->error_list);
     g_slist_foreach(cbdata->duplicates_list, (GFunc)(GCallback)g_free, NULL);
@@ -1072,6 +1129,24 @@ static gpointer session_close_threadfunc(gpointer gdata)
     tr_sessionClose(data->session);
     gdk_threads_add_idle(on_session_closed, data->cbdata);
     g_free(data);
+=======
+    gtk_main_quit( );
+
+    return FALSE;
+}
+
+static gpointer
+sessionCloseThreadFunc( gpointer gdata )
+{
+    /* since tr_sessionClose() is a blocking function,
+     * call it from another thread... when it's done,
+     * punt the GUI teardown back to the GTK+ thread */
+    struct cbdata * cbdata = gdata;
+    gdk_threads_enter( );
+    tr_core_close( cbdata->core );
+    gtr_idle_add( onSessionClosed, gdata );
+    gdk_threads_leave( );
+>>>>>>> upstream/1.7x
     return NULL;
 }
 
@@ -1146,10 +1221,14 @@ static void on_app_exit(gpointer vdata)
     placeWindowFromPrefs(cbdata->wind);
 
     /* shut down libT */
+<<<<<<< HEAD
     session_close_data = g_new(struct session_close_struct, 1);
     session_close_data->cbdata = cbdata;
     session_close_data->session = gtr_core_close(cbdata->core);
     g_thread_new("shutdown-thread", session_close_threadfunc, session_close_data);
+=======
+    g_thread_create( sessionCloseThreadFunc, vdata, TRUE, NULL );
+>>>>>>> upstream/1.7x
 }
 
 static void show_torrent_errors(GtkWindow* window, char const* primary, GSList** files)
@@ -1808,7 +1887,15 @@ void gtr_actions_handler(char const* action_name, gpointer user_data)
         GtkWidget* w = gtr_torrent_open_from_file_dialog_new(data->wind, data->core);
         gtk_widget_show(w);
     }
+<<<<<<< HEAD
     else if (g_strcmp0(action_name, "show-stats") == 0)
+=======
+    else if( !strcmp( action_name, "donate" ) )
+    {
+        gtr_open_file( "http://www.transmissionbt.com/donate.php" );
+    }
+    else if( !strcmp( action_name, "start-torrent" ) )
+>>>>>>> upstream/1.7x
     {
         GtkWidget* dialog = gtr_stats_dialog_new(data->wind, data->core);
         gtk_widget_show(dialog);
