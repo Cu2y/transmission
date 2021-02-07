@@ -258,7 +258,15 @@ static void gtr_tree_model_foreach_postorder(GtkTreeModel* model, GtkTreeModelFo
 
 static void refresh(FileData* data)
 {
+<<<<<<< HEAD
     tr_torrent* tor = gtr_core_find_torrent(data->core, data->torrentId);
+=======
+    tr_torrent * tor = NULL;
+    tr_session * session = tr_core_session( data->core );
+
+    if( session != NULL )
+        tor = tr_torrentFindFromId( session, data->torrentId );
+>>>>>>> upstream/1.7x
 
     if (tor == NULL)
     {
@@ -269,9 +277,14 @@ static void refresh(FileData* data)
         GtkSortType order;
         int sort_column_id;
         tr_file_index_t fileCount;
+<<<<<<< HEAD
         struct RefreshData refresh_data;
         GtkTreeSortable* sortable = GTK_TREE_SORTABLE(data->model);
         gtk_tree_sortable_get_sort_column_id(sortable, &sort_column_id, &order);
+=======
+        data->tor = tr_torrentFindFromId( session, data->torrentId );
+        data->refresh_file_stat = tr_torrentFiles( tor, &fileCount );
+>>>>>>> upstream/1.7x
 
         refresh_data.sort_column_id = sort_column_id;
         refresh_data.resort_needed = FALSE;
