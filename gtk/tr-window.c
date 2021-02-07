@@ -136,11 +136,35 @@ static GtkWidget* makeview(PrivateData* p)
     p->column = col = GTK_TREE_VIEW_COLUMN(g_object_new(GTK_TYPE_TREE_VIEW_COLUMN, "title", _("Torrent"), "resizable", TRUE,
         "sizing", GTK_TREE_VIEW_COLUMN_FIXED, NULL));
 
+<<<<<<< HEAD
     p->renderer = r = torrent_cell_renderer_new();
     gtk_tree_view_column_pack_start(col, r, FALSE);
     gtk_tree_view_column_add_attribute(col, r, "torrent", MC_TORRENT);
     gtk_tree_view_column_add_attribute(col, r, "piece-upload-speed", MC_SPEED_UP);
     gtk_tree_view_column_add_attribute(col, r, "piece-download-speed", MC_SPEED_DOWN);
+=======
+static void
+syncAltSpeedButton( PrivateData * p )
+{
+    char u[32];
+    char d[32];
+    char buf[512];
+    const char * fmt;
+    const gboolean b = pref_flag_get( TR_PREFS_KEY_ALT_SPEED_ENABLED );
+    GtkWidget * w = p->alt_speed_button;
+
+    tr_strlspeed( u, pref_int_get( TR_PREFS_KEY_ALT_SPEED_UP ), sizeof( u ) );
+    tr_strlspeed( d, pref_int_get( TR_PREFS_KEY_ALT_SPEED_DOWN ), sizeof( d ) );
+    fmt = b ? _( "Click to disable Temporary Speed Limits\n(%1$s down, %2$s up)" )
+            : _( "Click to enable Temporary Speed Limits\n(%1$s down, %2$s up)" );
+    g_snprintf( buf, sizeof( buf ), fmt, d, u );
+
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), b );
+    gtk_button_set_image( GTK_BUTTON( w ), p->alt_speed_image[b?1:0] );
+    gtk_button_set_alignment( GTK_BUTTON( w ), 0.5, 0.5 );
+    gtr_widget_set_tooltip_text( w, buf );
+}
+>>>>>>> upstream/1.7x
 
     gtk_tree_view_append_column(tree_view, col);
     g_object_set(r, "xpad", GUI_PAD_SMALL, "ypad", GUI_PAD_SMALL, NULL);
@@ -321,6 +345,7 @@ static gboolean onAskTrackerQueryTooltip(GtkWidget* widget, gint x, gint y, gboo
     }
     else
     {
+<<<<<<< HEAD
         char buf[512];
         char timebuf[64];
         int const seconds = maxTime - now;
@@ -329,6 +354,17 @@ static gboolean onAskTrackerQueryTooltip(GtkWidget* widget, gint x, gint y, gboo
         g_snprintf(buf, sizeof(buf), _("Tracker will allow requests in %s"), timebuf);
         gtk_tooltip_set_text(tooltip, buf);
         handled = TRUE;
+=======
+        char      buf[512];
+        char      timebuf[64];
+        const int seconds = maxTime - now;
+
+        tr_strltime( timebuf, seconds, sizeof( timebuf ) );
+        g_snprintf( buf, sizeof( buf ),
+                    _( "Tracker will allow requests in %s" ), timebuf );
+        gtk_tooltip_set_text( tooltip, buf );
+        return TRUE;
+>>>>>>> upstream/1.7x
     }
 
     return handled;
@@ -758,18 +794,51 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     prefsChanged(core, TR_KEY_alt_speed_enabled, self);
     p->pref_handler_id = g_signal_connect(core, "prefs-changed", G_CALLBACK(prefsChanged), self);
 
+<<<<<<< HEAD
     tr_sessionSetAltSpeedFunc(gtr_core_session(core), onAltSpeedToggled, p);
 
     gtr_window_refresh(GTK_WINDOW(self));
     return self;
+=======
+static void
+updateTorrentCount( PrivateData * p )
+{
+    if( p && p->core )
+    {
+        char      buf[512];
+        const int torrentCount = gtk_tree_model_iter_n_children(
+            tr_core_model( p->core ), NULL );
+        const int visibleCount = gtk_tree_model_iter_n_children(
+            p->filter_model, NULL );
+
+        if( !torrentCount )
+            *buf = '\0';
+        else if( torrentCount != visibleCount )
+            g_snprintf( buf, sizeof( buf ),
+                        ngettext( "%1$'d of %2$'d Torrent",
+                                  "%1$'d of %2$'d Torrents",
+                                  torrentCount ),
+                        visibleCount, torrentCount );
+        else
+            g_snprintf( buf, sizeof( buf ),
+                        ngettext( "%'d Torrent", "%'d Torrents", torrentCount ),
+                        torrentCount );
+        gtk_label_set_text( GTK_LABEL( p->gutter_lb ), buf );
+    }
+>>>>>>> upstream/1.7x
 }
 
 static void updateStats(PrivateData* p)
 {
+<<<<<<< HEAD
     char up[32];
     char down[32];
     char ratio[32];
     char buf[512];
+=======
+    const char *            pch;
+    char                    up[32], down[32], ratio[32], buf[512];
+>>>>>>> upstream/1.7x
     struct tr_session_stats stats;
     tr_session const* const session = gtr_core_session(p->core);
 
