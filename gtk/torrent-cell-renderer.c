@@ -211,6 +211,7 @@ static void getShortStatusString(GString* gstr, tr_torrent const* tor, tr_stat c
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
         {
+<<<<<<< HEAD
             char speedStr[64];
             char ratioStr[64];
             tr_strlratio(ratioStr, st->ratio, sizeof(ratioStr));
@@ -218,6 +219,17 @@ static void getShortStatusString(GString* gstr, tr_torrent const* tor, tr_stat c
             /* download/upload speed, ratio */
             g_string_append_printf(gstr, "%s  ", speedStr);
             g_string_append_printf(gstr, _("Ratio: %s"), ratioStr);
+=======
+            char buf[512];
+            if( torStat->activity != TR_STATUS_DOWNLOAD )
+            {
+                tr_strlratio( buf, torStat->ratio, sizeof( buf ) );
+                g_string_append_printf( gstr, _( "Ratio: %s" ), buf );
+                g_string_append( gstr, ", " );
+            }
+            getShortTransferString( torStat, uploadSpeed, downloadSpeed, buf, sizeof( buf ) );
+            g_string_append( gstr, buf );
+>>>>>>> upstream/1.7x
             break;
         }
 
